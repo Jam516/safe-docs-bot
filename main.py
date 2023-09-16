@@ -50,6 +50,7 @@ qa = RetrievalQA.from_chain_type(
 
 # Create the title at the top of page
 st.title('Safe Docs Bot 🪄')
+st.subheader('Everything you need to know to start building on Safe')
 
 with st.form("my_form"):
     text = st.text_area("Enter a question about Safe protocol:")
