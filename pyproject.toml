@@ -6,11 +6,12 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.10.0,<3.11"
-pinecone-client = "^2.2.4"
 streamlit = "^1.26.0"
 langchain = "^0.0.292"
 openai = "^0.28.0"
 tiktoken = "^0.5.1"
+aioboto3 = "^11.3.0"
+deeplake = "^3.6.26"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md

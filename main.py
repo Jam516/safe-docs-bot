@@ -3,17 +3,14 @@
 #--------------------------------------------------------#
 import streamlit as st
 import json
-import os
-import uuid
-import zipfile
 
-import openai
-import pinecone
+import argparse
+import os
+from langchain.vectorstores import DeepLake
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.schema import Document
-from langchain.vectorstores import Pinecone
+import openai
 
 #--------------------------------------------------------#
 # Page Config
@@ -29,20 +26,32 @@ st.set_page_config(
 # Functions
 #--------------------------------------------------------#
 
-index_name = "safe"
-OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
-PINECONE_API_KEY = os.environ['PINECONE_API_KEY']
+activeloop_username = 'kofi'
+repo_name= 'safe-contracts'
 
-pinecone.init(api_key=PINECONE_API_KEY, environment="gcp-starter")
-index = pinecone.Index(index_name)
+activeloop_dataset_path = f"hub://{activeloop_username}/{repo_name}"
 
-embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
-docsearch = Pinecone.from_existing_index(index_name, embeddings)
+# Create an instance of OpenAIEmbeddings
+embeddings = OpenAIEmbeddings()
 
-llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY)
-qa = RetrievalQA.from_chain_type(
-    llm=llm, chain_type="stuff", retriever=docsearch.as_retriever()
+# Create an instance of DeepLake with the specified dataset path and embeddings
+db = DeepLake(
+    dataset_path=activeloop_dataset_path,
+    read_only=True,
+    embedding_function=embeddings,
 )
+
+# Create a retriever from the DeepLake instance
+retriever = db.as_retriever()
+# Set the search parameters for the retriever
+retriever.search_kwargs["distance_metric"] = "cos"
+retriever.search_kwargs["fetch_k"] = 100
+retriever.search_kwargs["maximal_marginal_relevance"] = True
+retriever.search_kwargs["k"] = 10
+# Create a ChatOpenAI model instance
+model = ChatOpenAI(model="gpt-4")
+# Create a RetrievalQA instance from the model and retriever
+qa = RetrievalQA.from_llm(model, retriever=retriever)
 
 #--------------------------------------------------------#
 # Main Body
