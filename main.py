@@ -17,7 +17,7 @@ import openai
 #--------------------------------------------------------#
 
 st.set_page_config(
-  page_title="Safe Docs Bot",
+  page_title="Safe Bot",
   page_icon="🪄",
   layout="wide",
 )
@@ -59,7 +59,7 @@ qa = RetrievalQA.from_llm(model, retriever=retriever)
 
 # Create the title at the top of page
 st.title('Safe Contracts Bot 🪄')
-st.subheader('A bot that knows everything about the Safe contracts')
+st.subheader('A chatbot bot trained on the Safe contracts')
 
 with st.form("my_form"):
     text = st.text_area("Enter a question about Safe protocol:")
